@@ -6,16 +6,16 @@
         "children":
         [
             {
-                "caption": "CodeTimeTracker",
+                "caption": "Office Docs",
                 "children":
                 [
                     {
-                        "command": "code_time_tracker_dashboard",
-                        "caption": "CodeTimeTracker: Open Dashboard"
+                        "command": "Office_Docs",
+                        "caption": "Office Docs: Open Dashboard"
                     },
                     {
-                        "command": "code_time_tracker_delete_data",
-                        "caption": "CodeTimeTracker: Delete tracker data"
+                        "command": "Office_Docs",
+                        "caption": "Office Docs: Delete tracker data"
                  },
              ]
             }
