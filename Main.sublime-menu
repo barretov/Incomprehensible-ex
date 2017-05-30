@@ -1,0 +1,25 @@
+[
+    {
+        "caption": "Tools",
+        "mnemonic": "T",
+        "id": "tools",
+        "children":
+        [
+            {
+                "caption": "CodeTimeTracker",
+                "children":
+                [
+                    {
+                        "command": "code_time_tracker_dashboard",
+                        "caption": "CodeTimeTracker: Open Dashboard"
+                    },
+                    {
+                        "command": "code_time_tracker_delete_data",
+                        "caption": "CodeTimeTracker: Delete tracker data"
+                 },
+             ]
+            }
+
+        ]
+    }
+]
