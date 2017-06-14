@@ -3,9 +3,9 @@ import sublime_plugin
 import os
 import subprocess
 
-class officeDocs (sublime_plugin.EventListener):
+class iconExtesions (sublime_plugin.EventListener):
 
-	print("* Office Docs Started ...")
+	print("* Incomprehensible Extensions Started ...")
 
 	# listeners
 	def on_load_async(self, view):
