@@ -1,2 +1,2 @@
-# Office-Docs
-Sublime plugin to edit microsoft office documents
+# Incomprehensible Extensions
+Sublime text plugin to view and edit docx and pdf files

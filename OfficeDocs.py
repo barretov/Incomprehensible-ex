@@ -1,71 +1,82 @@
 import sublime
 import sublime_plugin
-import zipfile
 import os
-
+import subprocess
 
 class officeDocs (sublime_plugin.EventListener):
 
-	path = 'none'
-	file = 'none'
+	print("* Office Docs Started ...")
 
-    # show init message
-	sublime.active_window().status_message("Office Docs | Started")
-
-    # show console message
-	print("............::::::::| Office Docs | Started |::::::::............")
-
-	#  listeners  #
+	# listeners
 	def on_load_async(self, view):
-		# print(view.file_name)
+		if (sublime.active_window().extract_variables()['file_extension'] == 'docx'):
+			self.handle_active(view)
 
-		# view.set_scratch(True)
-		self.handle_active(view)
-		# view.window().run_command('close')
-		# view.erase(view, view.visible_region())
-		# print(view.find_all("[\t ]+$"))
-		# view.erase(edit, view.find_all("[\t ]+$"))
+	def on_pre_close(self, view):
+		if (sublime.active_window().extract_variables()['file_extension'] == 'ofdsc'):
+			self.deleteTemp(view)
 
-	def on_clone_async(self, view):
-		self.handle_active()
+	def on_post_save(self, view):
+		if (sublime.active_window().extract_variables()['file_extension'] == 'ofdsc'):
+			self.saveTemp(view)
 
-	# def on_new_async(self, view):
+	# function to set the variables
+	def initVariables(self, view):
+		self.path = sublime.active_window().extract_variables()['file_path']
+		self.file = sublime.active_window().extract_variables()['file_name']
+		self.ext = sublime.active_window().extract_variables()['file_extension']
+		self.target = os.path.join(os.path.realpath(sublime.packages_path()), "User")
 
-	# def on_post_save(self, view):
+	# Function for delete temporary file
+	def deleteTemp(self, view):
+		self.initVariables(view)
+		# delete temp file
+		os.remove(os.path.join(self.path, self.file))
 
-	# def on_close(self, view):
-		# self.handle_active(view)
-	# def on_modified(self, view):
+	# Function to save the temp file in original file
+	def saveTemp(self, view):
+		self.initVariables(view)
 
-	# controller
+		# convert text file to original extension file
+		result, errors = subprocess.Popen('pandoc -o '+os.path.join(self.path, self.file[:-6])+' -w docx '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+
+	# Function for process the file
 	def handle_active(self, view):
 
 		try:
 
-			active = sublime.active_window().extract_variables()
-			self.path = active['file_path']
-			self.file = active['file_name']
-			self.ext  = active['file_extension']
+			self.initVariables(view)
+			sublime.active_window().run_command('close')
 
-			if (active['file_extension'] == 'docx'):
+			# verificar se está marcado somente como visualizaçao
+			if (False):
 
-				print(self.path)
+				result, errors = subprocess.Popen('pandoc -s -o '+self.target+self.file+'.txt -w plain '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
 
-				zip_ref = zipfile.ZipFile(os.path.join(self.path, self.file), 'r')
-				zip_ref.extractall(os.path.join(self.path, 'tempdoc'))
-				zip_ref.close()
+				# create new file to recive the text
+				output_view = sublime.active_window().new_file()
+				output_view.set_name(self.file)
+				output_view.set_scratch(True)
 
-				# view.window().new_file()
-				# view.window().run_command('close')
-				sublime.active_window().run_command('close')
-				print(sublime.active_window().open_file('tempdoc'+'/content.xml'))
+				# open,read and close the file converted
+				file = open(self.target+self.file+'.txt', 'r')
+				text = file.read()
+				file.close()
 
+				# remove converted file
+				os.remove(self.target+self.file+'.txt')
+				#  past data in the new file
+				output_view.run_command("insert",{"characters": text})
+				#  move the cursor to the top of the page
+				output_view.run_command("move_to",{"to": "bof"})
 
-				# self.original_file['name'] = sublime.active_window().extract_variables()['file_base_name']
-				# self.original_file['ext'] = sublime.active_window().extract_variables()['file_extension']
-				# print(sublime.active_window().extract_variables()['file_base_name'])
-				# print(sublime.active_window().extract_variables()['file_extension'])
+			else:
+				# convert the file to text
+				result, errors = subprocess.Popen('pandoc -o '+os.path.join(self.path, self.file)+'.ofdsc -w plain '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+
+				print(errors)
+
+				sublime.active_window().open_file(os.path.join(self.path, self.file)+'.ofdsc')
 
 		except KeyError as error:
-			sublime.active_window().status_message("Erros!")
-			# print("CodeTimeTracker | You are working out of project. Make a project")
+			print(error)
