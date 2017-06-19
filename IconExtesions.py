@@ -36,9 +36,21 @@ class iconExtesions (sublime_plugin.EventListener):
 	# Function to save the temp file in original file
 	def saveTemp(self, view):
 		self.initVariables(view)
-
+		# set file paths to input and output
+		inp = os.path.join(self.path, self.file)
+		out = os.path.join(self.path, self.file[:-6])
+		# convert files
+		# self.convert(inp, out, "docx")
+		self.convert(self)
 		# convert text file to original extension file
-		result, errors = subprocess.Popen('pandoc -o '+os.path.join(self.path, self.file[:-6])+' -w docx '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+		# result, errors = subprocess.Popen('pandoc -o '+os.path.join(self.path, self.file[:-6])+' -w docx '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+
+	# Function to convert file
+	def convert(self):
+		try:
+			result, errors = subprocess.Popen('pandoc -o '+out+' -w '+ 'docx' + inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+		except Exception as error:
+			print(error)
 
 	# Function for process the file
 	def handle_active(self, view):
@@ -51,7 +63,7 @@ class iconExtesions (sublime_plugin.EventListener):
 			# verificar se está marcado somente como visualizaçao
 			if (False):
 
-				result, errors = subprocess.Popen('pandoc -s -o '+self.target+self.file+'.txt -w plain '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+				result, errors = subprocess.Popen('pandoc -o '+self.target+self.file+'.txt -w plain '+os.path.join(self.path, self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
 
 				# create new file to recive the text
 				output_view = sublime.active_window().new_file()
