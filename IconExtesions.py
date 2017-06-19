@@ -7,17 +7,20 @@ class iconExtesions (sublime_plugin.EventListener):
 
     print("* Incomprehensible Extensions Started ...")
 
+    # known extensions
+    extension = ['docx', 'pdf', 'epub', 'odt']
+
     # listeners
     def on_load_async(self, view):
-        if (sublime.active_window().extract_variables()['file_extension'] == 'docx'):
+        if sublime.active_window().extract_variables()['file_extension'] in self.extension:
             self.handle_active(view)
 
     def on_pre_close(self, view):
-        if (sublime.active_window().extract_variables()['file_extension'] == 'ofdsc'):
+        if (sublime.active_window().extract_variables()['file_extension'] == 'inex'):
             self.deleteTemp(view)
 
     def on_post_save(self, view):
-        if (sublime.active_window().extract_variables()['file_extension'] == 'ofdsc'):
+        if (sublime.active_window().extract_variables()['file_extension'] == 'inex'):
             self.saveTemp(self)
 
     # function to set the variables
@@ -39,8 +42,11 @@ class iconExtesions (sublime_plugin.EventListener):
             self.initVariables(view)
             # set file paths to input and output
             inp = os.path.join(self.path, self.file)
-            out = os.path.join(self.path, self.file[:-6])
-            ext = "docx"
+            out = os.path.join(self.path, self.file[:-5])
+            # set original extension
+            ext = self.file.find('.')
+            ext = self.file[ext+1:-5]
+            # convert file
             self.convert(self, inp, out, ext)
         except Exception as error:
             print(error)
@@ -55,7 +61,9 @@ class iconExtesions (sublime_plugin.EventListener):
     # Function for process the file
     def handle_active(self, view):
         try:
+            # set common variables
             self.initVariables(view)
+            # close original docx file opened
             sublime.active_window().run_command('close')
 
             # verificar se está marcado somente como visualizaçao
@@ -87,11 +95,10 @@ class iconExtesions (sublime_plugin.EventListener):
             else:
                 # set file paths to input and output
                 inp = os.path.join(self.path, self.file)
-                out = os.path.join(self.path, self.file+'.ofdsc')
-                ext = "plain"
+                out = os.path.join(self.path, self.file+'.inex')
                 # convert file
-                self.convert(self, inp, out, ext)
+                self.convert(self, inp, out, 'plain')
                 # open new file
-                sublime.active_window().open_file(os.path.join(self.path, self.file)+'.ofdsc')
+                sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
         except KeyError as error:
             print(error)
