@@ -1,6 +1,17 @@
 [
     {
-        "command": "Office_Docs",
-        "caption": "Office Docs: Command"
+        "command": "incomprehensible_ex_edit_mode_on",
+        "caption": "Incomprehensible Ex: Edit Mode ON"
     },
+    {
+        "command": "incomprehensible_ex_edit_mode_off",
+        "caption": "Incomprehensible Ex: Edit Mode OFF"
+    },
+    {
+        "caption": "Incomprehensible Ex: Manage Settings",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/User/incomprehensibleex.sublime-settings"
+        }
+    }
 ]

@@ -6,18 +6,18 @@
         "children":
         [
             {
-                "caption": "Office Docs",
+                "caption": "Imcomprehensible Ex",
                 "children":
                 [
                     {
-                        "command": "Office_Docs",
-                        "caption": "Office Docs: Open Dashboard"
+                        "command": "incomprehensible_ex_edit_mode_on",
+                        "caption": "Edit Mode ON"
                     },
                     {
-                        "command": "Office_Docs",
-                        "caption": "Office Docs: Delete tracker data"
-                 },
-             ]
+                        "command": "incomprehensible_ex_edit_mode_off",
+                        "caption": "Edit Mode OFF"
+                    },
+                ]
             }
 
         ]

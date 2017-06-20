@@ -3,25 +3,45 @@ import sublime_plugin
 import os
 import subprocess
 
-class iconExtesions (sublime_plugin.EventListener):
+class IncomprehensibleEx (sublime_plugin.EventListener):
 
     print("* Incomprehensible Extensions Started ...")
 
     # known extensions
-    extension = ['docx', 'pdf', 'epub', 'odt']
+    extensions = ['docx', 'epub', 'odt']
+    # mode
+    editMode = True
+
+    # load Inconprehensible Ex user settings
+    fileSettings = sublime.load_settings('incomprehensibleex.sublime-settings')
+
+    # set Inconprehensible Ex user settings if removed
+    if not fileSettings.has('extensions'):
+        fileSettings.set('extensions', extensions)
+    else:
+        extensions = fileSettings.get('extensions')
+
+    if not fileSettings.has('edit_mode'):
+        fileSettings.set('edit_mode', editMode)
+    else:
+        editMode = fileSettings.get('edit_mode')
+
+    sublime.save_settings('incomprehensibleex.sublime-settings')
 
     # listeners
     def on_load_async(self, view):
-        if sublime.active_window().extract_variables()['file_extension'] in self.extension:
+        if sublime.active_window().extract_variables()['file_extension'] in self.extensions:
             self.handle_active(view)
 
     def on_pre_close(self, view):
-        if (sublime.active_window().extract_variables()['file_extension'] == 'inex'):
-            self.deleteTemp(view)
+        if not (view.is_scratch()):
+            if sublime.active_window().extract_variables()['file_extension'] == 'inex':
+                self.deleteTemp(view)
 
     def on_post_save(self, view):
-        if (sublime.active_window().extract_variables()['file_extension'] == 'inex'):
-            self.saveTemp(self)
+        if not (view.is_scratch()):
+            if sublime.active_window().extract_variables()['file_extension'] == 'inex':
+                self.saveTemp(self)
 
     # function to set the variables
     def initVariables(self, view):
@@ -54,7 +74,8 @@ class iconExtesions (sublime_plugin.EventListener):
     # Function to convert file
     def convert(self, view, inp, out, ext):
         try:
-            result, errors = subprocess.Popen('pandoc -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+            result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+            print('pandoc -s -o '+out+' -w '+ext+' '+inp)
         except Exception as error:
             print(error)
 
@@ -66,15 +87,14 @@ class iconExtesions (sublime_plugin.EventListener):
             # close original docx file opened
             sublime.active_window().run_command('close')
 
-            # verificar se está marcado somente como visualizaçao
-            if (False):
+            # verify if it's editable
+            if not self.editMode:
 
                 # set file paths to input and output
                 inp = os.path.join(self.path, self.file)
                 out = os.path.join(self.target, self.file)
-                ext = "plain"
-                # # convert file
-                self.convert(self, inp, out, ext)
+                # convert file
+                self.convert(self, inp, out, 'plain')
 
                 # create new file to recive the text
                 output_view = sublime.active_window().new_file()
@@ -102,3 +122,23 @@ class iconExtesions (sublime_plugin.EventListener):
                 sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
         except KeyError as error:
             print(error)
+
+class IncomprehensibleExEditModeOnCommand(sublime_plugin.ApplicationCommand):
+
+    def run(self):
+        try:
+            IncomprehensibleEx.editMode = True
+            IncomprehensibleEx.fileSettings.set('edit_mode', True)
+            sublime.active_window().status_message("Incomprehensible Ex | Edit Mode ON")
+        except Exception as e:
+            print(e)
+
+class IncomprehensibleExEditModeOffCommand(sublime_plugin.ApplicationCommand):
+
+    def run(self):
+        try:
+            IncomprehensibleEx.editMode = False
+            IncomprehensibleEx.fileSettings.set('edit_mode', False)
+            sublime.active_window().status_message("Incomprehensible Ex | Edit Mode OFF")
+        except Exception as e:
+            print(e)
