@@ -1,11 +1,11 @@
-import sublime
-import sublime_plugin
 import os
+import sublime
 import subprocess
+import sublime_plugin
 
 class IncomprehensibleEx (sublime_plugin.EventListener):
 
-    print("* Incomprehensible Extensions Started ...")
+    print("** Incomprehensible Extensions Started **")
 
     # known extensions
     extensions = ['docx', 'epub', 'odt']
@@ -75,7 +75,6 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     def convert(self, view, inp, out, ext):
         try:
             result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
-            print('pandoc -s -o '+out+' -w '+ext+' '+inp)
         except Exception as error:
             print(error)
 
