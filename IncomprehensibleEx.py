@@ -29,7 +29,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     sublime.save_settings('incomprehensibleex.sublime-settings')
 
     # listeners
-    def on_load_async(self, view):
+    def on_load(self, view):
         if sublime.active_window().extract_variables()['file_extension'] in self.extensions:
             self.handle_active(view)
 
