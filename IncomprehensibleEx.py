@@ -10,7 +10,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     # known extensions
     extensions = ['docx', 'epub', 'odt']
     # mode
-    editMode = True
+    editMode = False
 
     # load Inconprehensible Ex user settings
     fileSettings = sublime.load_settings('incomprehensibleex.sublime-settings')
@@ -93,7 +93,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
                 inp = os.path.join(self.path, self.file)
                 out = os.path.join(self.target, self.file)
                 # convert file
-                self.convert(self, inp, out, 'plain')
+                self.convert(self, inp, out, 'asciidoc')
 
                 # create new file to recive the text
                 output_view = sublime.active_window().new_file()
@@ -116,7 +116,8 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
                 inp = os.path.join(self.path, self.file)
                 out = os.path.join(self.path, self.file+'.inex')
                 # convert file
-                self.convert(self, inp, out, 'plain')
+                # @TODO: epub | testar as extensoes e setar as melhores visoes de acordo com a extensao original.
+                self.convert(self, inp, out, 'asciidoc')
                 # open new file
                 sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
         except KeyError as error:
