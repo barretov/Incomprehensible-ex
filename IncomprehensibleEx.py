@@ -74,7 +74,11 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     # Function to convert file
     def convert(self, view, inp, out, ext):
         try:
+            # result, errors = subprocess.Popen('textract -o '+out+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+
+            # pandoc
             result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+            print(errors)
         except Exception as error:
             print(error)
 
@@ -88,7 +92,6 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
 
             # verify if it's editable
             if not self.editMode:
-
                 # set file paths to input and output
                 inp = os.path.join(self.path, self.file)
                 out = os.path.join(self.target, self.file)
@@ -102,15 +105,13 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
 
                 # open,read and close the file converted
                 file = open(os.path.join(self.target, self.file), 'r')
-                text = file.read()
+                output_view.run_command("insert",{"characters": file.read()})
                 file.close()
 
-                # remove converted file
-                os.remove(os.path.join(self.target, self.file))
-                #  past data in the new file
-                output_view.run_command("insert",{"characters": text})
                 #  move the cursor to the top of the page
                 output_view.run_command("move_to",{"to": "bof"})
+                # remove converted file
+                os.remove(os.path.join(self.target, self.file))
             else:
                 # set file paths to input and output
                 inp = os.path.join(self.path, self.file)
