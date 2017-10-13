@@ -2,31 +2,38 @@ import os
 import sublime
 import subprocess
 import sublime_plugin
+# import threading
 
 class IncomprehensibleEx (sublime_plugin.EventListener):
 
     print("** Incomprehensible Extensions Started **")
-
     # known extensions
-    extensions = ['docx', 'epub', 'odt']
+    extensions = ['docx', 'epub', 'odt', 'pdf']
     # mode
     editMode = False
+    # thread = False
 
-    # load Inconprehensible Ex user settings
-    fileSettings = sublime.load_settings('incomprehensibleex.sublime-settings')
+    # def __init__(self):
+    #     self.stdout = None
+    #     self.stderr = None
+    #     threading.Thread.__init__(self)
 
-    # set Inconprehensible Ex user settings if removed
-    if not fileSettings.has('extensions'):
-        fileSettings.set('extensions', extensions)
-    else:
-        extensions = fileSettings.get('extensions')
+    def run(self):
+        # load Inconprehensible Ex user settings
+        fileSettings = sublime.load_settings('incomprehensibleex.sublime-settings')
 
-    if not fileSettings.has('edit_mode'):
-        fileSettings.set('edit_mode', editMode)
-    else:
-        editMode = fileSettings.get('edit_mode')
+        # set Inconprehensible Ex user settings if removed
+        if not fileSettings.has('extensions'):
+            fileSettings.set('extensions', extensions)
+        else:
+            extensions = fileSettings.get('extensions')
 
-    sublime.save_settings('incomprehensibleex.sublime-settings')
+        if not fileSettings.has('edit_mode'):
+            fileSettings.set('edit_mode', editMode)
+        else:
+            editMode = fileSettings.get('edit_mode')
+
+        sublime.save_settings('incomprehensibleex.sublime-settings')
 
     # listeners
     def on_load(self, view):
@@ -74,11 +81,25 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     # Function to convert file
     def convert(self, view, inp, out, ext):
         try:
-            # result, errors = subprocess.Popen('textract -o '+out+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+            print("########################## esta passando aqui")
+            p = subprocess.Popen('textract -o '+out+' '+inp, stdout=subprocess.PIPE, shell=True)
+            (output, err) = p.communicate()
+            p_status = p.wait()
+            print(p_status)
+            print(output)
+            print(err)
+            # Popen.wait()
+
+            # result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
             # pandoc
-            result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
-            print(errors)
+            # result, errors
+            # teste com Thread
+            # self.thread.start()
+            # self.thread = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            # self.thread.communicate()
+            # print(result)
+            # print(errors)
         except Exception as error:
             print(error)
 
@@ -92,6 +113,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
 
             # verify if it's editable
             if not self.editMode:
+                print('############################# READ MODE')
                 # set file paths to input and output
                 inp = os.path.join(self.path, self.file)
                 out = os.path.join(self.target, self.file)
