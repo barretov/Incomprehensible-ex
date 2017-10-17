@@ -8,9 +8,9 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
 
     print("** Incomprehensible Extensions Started **")
     # known extensions for read mode
-    extensions = ['docx', 'epub', 'odt', 'pdf']
+    extensions = ['mp3','odt','ogg','pdf','pptx','ps','psv','rtf','tff','tif','tiff','tsv','wav','xls','xlsx','doc','docx','eml','epub']
     # extensions can be editable
-    editable_extensions = ['asciidoc', 'beamer', 'commonmark', 'context', 'docbook', 'docx', 'dokuwiki', 'dzslides', 'epub', 'epub3', 'fb2', 'haddock', 'html', 'html5', 'icml', 'latex', 'man', 'markdown', 'markdown_github', 'markdown_mmd', 'markdown_phpextra', 'markdown_strict', 'mediawiki', 'native', 'odt', 'opendocument', 'opml', 'org', 'plain', 'revealjs', 'rst', 'rtf', 's5', 'slideous', 'slidy', 'texinfo', 'textile']
+    editable_extensions = ['asciidoc', 'beamer', 'commonmark', 'context', 'docbook', 'docx', 'dokuwiki', 'dzslides', 'fb2', 'haddock', 'html', 'html5', 'icml', 'latex', 'man', 'markdown', 'markdown_github', 'markdown_mmd', 'markdown_phpextra', 'markdown_strict', 'mediawiki', 'native', 'odt', 'opendocument', 'opml', 'org', 'plain', 'revealjs', 'rst', 'rtf', 's5', 'slideous', 'slidy', 'texinfo', 'textile']
     # mode
     editMode = False
     # thread = False
