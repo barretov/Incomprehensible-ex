@@ -7,8 +7,10 @@ import sublime_plugin
 class IncomprehensibleEx (sublime_plugin.EventListener):
 
     print("** Incomprehensible Extensions Started **")
-    # known extensions
+    # known extensions for read mode
     extensions = ['docx', 'epub', 'odt', 'pdf']
+    # extensions can be editable
+    editable_extensions = ['asciidoc', 'beamer', 'commonmark', 'context', 'docbook', 'docx', 'dokuwiki', 'dzslides', 'epub', 'epub3', 'fb2', 'haddock', 'html', 'html5', 'icml', 'latex', 'man', 'markdown', 'markdown_github', 'markdown_mmd', 'markdown_phpextra', 'markdown_strict', 'mediawiki', 'native', 'odt', 'opendocument', 'opml', 'org', 'plain', 'revealjs', 'rst', 'rtf', 's5', 'slideous', 'slidy', 'texinfo', 'textile']
     # mode
     editMode = False
     # thread = False
@@ -21,7 +23,6 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     def run(self):
         # load Inconprehensible Ex user settings
         fileSettings = sublime.load_settings('incomprehensibleex.sublime-settings')
-
         # set Inconprehensible Ex user settings if removed
         if not fileSettings.has('extensions'):
             fileSettings.set('extensions', extensions)
@@ -73,33 +74,25 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             # set original extension
             ext = self.file.find('.')
             ext = self.file[ext+1:-5]
-            # convert file
-            self.convert(self, inp, out, ext)
+            # verify if can be editable
+            if ext in self.editable_extensions:
+                # convert file
+                self.convert(self, inp, out, ext, True)
+            else:
+                print(ext + "Is not supported for edit mode")
         except Exception as error:
             print(error)
 
     # Function to convert file
-    def convert(self, view, inp, out, ext):
+    def convert(self, view, inp, out, ext, save):
         try:
-            print("########################## esta passando aqui")
-            p = subprocess.Popen('textract -o '+out+' '+inp, stdout=subprocess.PIPE, shell=True)
-            (output, err) = p.communicate()
-            p_status = p.wait()
-            print(p_status)
-            print(output)
-            print(err)
-            # Popen.wait()
-
-            # result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-
-            # pandoc
-            # result, errors
-            # teste com Thread
-            # self.thread.start()
-            # self.thread = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            # self.thread.communicate()
-            # print(result)
-            # print(errors)
+            # verify for save
+            if not save:
+                # verify if exists textract instaled
+                result, errors = subprocess.Popen('textract -o '+out+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+            else:
+                # verify if exists pandoc instaled
+                result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
         except Exception as error:
             print(error)
 
@@ -110,39 +103,34 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             self.initVariables(view)
             # close original docx file opened
             sublime.active_window().run_command('close')
-
             # verify if it's editable
-            if not self.editMode:
-                print('############################# READ MODE')
-                # set file paths to input and output
-                inp = os.path.join(self.path, self.file)
-                out = os.path.join(self.target, self.file)
-                # convert file
-                self.convert(self, inp, out, 'asciidoc')
-
-                # create new file to recive the text
-                output_view = sublime.active_window().new_file()
-                output_view.set_name(self.file)
-                output_view.set_scratch(True)
-
-                # open,read and close the file converted
-                file = open(os.path.join(self.target, self.file), 'r')
-                output_view.run_command("insert",{"characters": file.read()})
-                file.close()
-
-                #  move the cursor to the top of the page
-                output_view.run_command("move_to",{"to": "bof"})
-                # remove converted file
-                os.remove(os.path.join(self.target, self.file))
-            else:
+            if self.editMode and self.ext in self.editable_extensions:
                 # set file paths to input and output
                 inp = os.path.join(self.path, self.file)
                 out = os.path.join(self.path, self.file+'.inex')
                 # convert file
                 # @TODO: epub | testar as extensoes e setar as melhores visoes de acordo com a extensao original.
-                self.convert(self, inp, out, 'asciidoc')
+                self.convert(self, inp, out, self.ext, False)
                 # open new file
                 sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
+            else:
+                # set file paths to input and output
+                inp = os.path.join(self.path, self.file)
+                out = os.path.join(self.target, self.file)
+                # convert file
+                self.convert(self, inp, out, self.ext, False)
+                # create new file to recive the text
+                output_view = sublime.active_window().new_file()
+                output_view.set_name(self.file)
+                output_view.set_scratch(True)
+                # open,read and close the file converted
+                file = open(os.path.join(self.target, self.file), 'r')
+                output_view.run_command("insert",{"characters": file.read()})
+                file.close()
+                #  move the cursor to the top of the page
+                output_view.run_command("move_to",{"to": "bof"})
+                # remove converted file
+                os.remove(os.path.join(self.target, self.file))
         except KeyError as error:
             print(error)
 
