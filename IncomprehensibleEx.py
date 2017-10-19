@@ -2,7 +2,6 @@ import os
 import sublime
 import subprocess
 import sublime_plugin
-# import threading
 
 class IncomprehensibleEx (sublime_plugin.EventListener):
 
@@ -13,12 +12,6 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     editable_extensions = ['asciidoc', 'beamer', 'commonmark', 'context', 'docbook', 'docx', 'dokuwiki', 'dzslides', 'fb2', 'haddock', 'html', 'html5', 'icml', 'latex', 'man', 'markdown', 'markdown_github', 'markdown_mmd', 'markdown_phpextra', 'markdown_strict', 'mediawiki', 'native', 'odt', 'opendocument', 'opml', 'org', 'plain', 'revealjs', 'rst', 'rtf', 's5', 'slideous', 'slidy', 'texinfo', 'textile']
     # mode
     editMode = False
-    # thread = False
-
-    # def __init__(self):
-    #     self.stdout = None
-    #     self.stderr = None
-    #     threading.Thread.__init__(self)
 
     def run(self):
         # load Inconprehensible Ex user settings
@@ -37,7 +30,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
         sublime.save_settings('incomprehensibleex.sublime-settings')
 
     # listeners
-    def on_load(self, view):
+    def on_load_async(self, view):
         if sublime.active_window().extract_variables()['file_extension'] in self.extensions:
             self.handle_active(view)
 
@@ -75,24 +68,38 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             ext = self.file.find('.')
             ext = self.file[ext+1:-5]
             # verify if can be editable
-            if ext in self.editable_extensions:
-                # convert file
-                self.convert(self, inp, out, ext, True)
+            if ext in self.editable_extensions and self.editMode == True:
+                self.convert(self, inp, out, ext, self.editMode)
             else:
-                print(ext + "Is not supported for edit mode")
+                print(ext + " is not supported for edit mode or can't save this file")
         except Exception as error:
             print(error)
 
     # Function to convert file
     def convert(self, view, inp, out, ext, save):
         try:
-            # verify for save
-            if not save:
-                # verify if exists textract instaled
-                result, errors = subprocess.Popen('textract -o '+out+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
-            else:
+            # verify if exists textract instaled
+            command = 'textract -o '+out+' '+inp
+            if save:
                 # verify if exists pandoc instaled
-                result, errors = subprocess.Popen('pandoc -s -o '+out+' -w '+ext+' '+inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
+                command = 'pandoc -s -o '+out+' -w '+ext+' '+inp
+
+            proc = subprocess.Popen(
+                command,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                shell=True
+                )
+
+            while proc.poll() is None:
+                sublime.active_window().status_message("| Inc. Ex. - Processing [=  ]")
+                sublime.active_window().status_message("| Inc. Ex. - Processing [ = ]")
+                sublime.active_window().status_message("| Inc. Ex. - Processing [  =]")
+                sublime.active_window().status_message("| Inc. Ex. - Processing [ = ]")
+                sublime.active_window().status_message("| Inc. Ex. - Processing [=  ]")
+
+                if proc.poll() == 0:
+                    break
         except Exception as error:
             print(error)
 
@@ -103,34 +110,18 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             self.initVariables(view)
             # close original docx file opened
             sublime.active_window().run_command('close')
-            # verify if it's editable
-            if self.editMode and self.ext in self.editable_extensions:
-                # set file paths to input and output
-                inp = os.path.join(self.path, self.file)
-                out = os.path.join(self.path, self.file+'.inex')
-                # convert file
-                # @TODO: epub | testar as extensoes e setar as melhores visoes de acordo com a extensao original.
-                self.convert(self, inp, out, self.ext, False)
-                # open new file
-                sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
-            else:
-                # set file paths to input and output
-                inp = os.path.join(self.path, self.file)
-                out = os.path.join(self.target, self.file)
-                # convert file
-                self.convert(self, inp, out, self.ext, False)
-                # create new file to recive the text
-                output_view = sublime.active_window().new_file()
-                output_view.set_name(self.file)
-                output_view.set_scratch(True)
-                # open,read and close the file converted
-                file = open(os.path.join(self.target, self.file), 'r')
-                output_view.run_command("insert",{"characters": file.read()})
-                file.close()
-                #  move the cursor to the top of the page
-                output_view.run_command("move_to",{"to": "bof"})
-                # remove converted file
-                os.remove(os.path.join(self.target, self.file))
+            # set file paths to input and output
+            inp = os.path.join(self.path, self.file)
+            out = os.path.join(self.path, self.file+'.inex')
+            # convert file
+            self.convert(self, inp, out, self.ext, False)
+            # open new file
+            transient = sublime.TRANSIENT
+            if self.editMode:
+                transient = 0
+
+            sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex', transient)
+            view.set_status('toggle_readonly', 'Readonly')
         except KeyError as error:
             print(error)
 
