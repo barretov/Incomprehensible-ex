@@ -6,14 +6,14 @@ Sublime Text plugin to read or edit incomprehensible files as docx, odt, pdf, ep
 About
 
     Recognized extensions in read mode:
-        csv, doc, docx, eml, epub, gif, jpg, json, html, mp3, msg, odt, ogg, pdf, png, pptx, ps, rtf, tiff,
-        txt, wav, xlsx, xls
+        csv, doc, docx, eml, epub, gif, jpg, json, html, mp3, msg, odt, ogg, pdf, png, pptx, ps, rtf,
+        tiff, txt, wav, xlsx, xls
 
     Extensions that can be dictated in edit mode:
-        'asciidoc', 'beamer', 'commonmark', 'context', 'docbook', 'docx', 'dokuwiki', 'dzslides', 'fb2', 'haddock',
-        'html', 'html5', 'icml', 'latex', 'man', 'markdown', 'markdown_github', 'markdown_mmd', 'markdown_phpextra',
-        'markdown_strict', 'mediawiki', 'native', 'odt', 'opendocument', 'opml', 'org', 'plain', 'revealjs', 'rst',
-        'rtf', 's5', 'slideous', 'slidy', 'texinfo', 'textile'
+        asciidoc, beamer, commonmark, context, docbook, docx, dokuwiki, dzslides, fb2, haddock, html,
+        html5, icml, latex, man, markdown, markdown_github, markdown_mmd, markdown_phpextra,
+        markdown_strict, mediawiki, native, odt, opendocument, opml, org, plain, revealjs, rst, rtf, s5,
+        slideous, slidy, texinfo, textile
 
 Configuration
 
