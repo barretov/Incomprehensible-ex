@@ -1,7 +1,4 @@
-import os
-import sublime
-import subprocess
-import sublime_plugin
+import os, sublime, subprocess, sublime_plugin, threading
 
 class IncomprehensibleEx (sublime_plugin.EventListener):
 
@@ -10,8 +7,9 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
     extensions = ['mp3','odt','ogg','pdf','pptx','ps','psv','rtf','tff','tif','tiff','tsv','wav','xls','xlsx','doc','docx','eml','epub']
     # extensions can be editable
     editable_extensions = ['asciidoc', 'beamer', 'commonmark', 'context', 'docbook', 'docx', 'dokuwiki', 'dzslides', 'fb2', 'haddock', 'html', 'html5', 'icml', 'latex', 'man', 'markdown', 'markdown_github', 'markdown_mmd', 'markdown_phpextra', 'markdown_strict', 'mediawiki', 'native', 'odt', 'opendocument', 'opml', 'org', 'plain', 'revealjs', 'rst', 'rtf', 's5', 'slideous', 'slidy', 'texinfo', 'textile']
-    # mode
+
     editMode = False
+    thread = False
 
     def run(self):
         # load Inconprehensible Ex user settings
@@ -30,9 +28,22 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
         sublime.save_settings('incomprehensibleex.sublime-settings')
 
     # listeners
-    def on_load_async(self, view):
+    def on_load(self, view):
         if sublime.active_window().extract_variables()['file_extension'] in self.extensions:
-            self.handle_active(view)
+
+            # set common variables
+            self.initVariables(view)
+            # close original docx file opened
+            sublime.active_window().run_command('close')
+            # set file paths to input and output
+            self.inp = os.path.join(self.path, self.file)
+            self.out = os.path.join(self.path, self.file+'.inex')
+            self.thread = threading.Thread(target=self.handle_active,
+                                           args={'view'},
+                                           name=self.file
+                                           )
+
+            self.thread.start()
 
     def on_pre_close(self, view):
         if not (view.is_scratch()):
@@ -100,28 +111,20 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
 
                 if proc.poll() == 0:
                     break
+
         except Exception as error:
             print(error)
 
     # Function for process the file
     def handle_active(self, view):
         try:
-            # set common variables
-            self.initVariables(view)
-            # close original docx file opened
-            sublime.active_window().run_command('close')
-            # set file paths to input and output
-            inp = os.path.join(self.path, self.file)
-            out = os.path.join(self.path, self.file+'.inex')
             # convert file
-            self.convert(self, inp, out, self.ext, False)
+            self.convert(self, self.inp, self.out, self.ext, False)
             # open new file
-            transient = sublime.TRANSIENT
-            if self.editMode:
-                transient = 0
+            sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
+            # @TODO:, indent | Arrumar
+            sublime.active_window().run_command("reindent", {"single_line": false})
 
-            sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex', transient)
-            view.set_status('toggle_readonly', 'Readonly')
         except KeyError as error:
             print(error)
 
