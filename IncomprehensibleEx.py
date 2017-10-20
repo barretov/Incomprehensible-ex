@@ -45,14 +45,20 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             self.thread.start()
 
     def on_pre_close(self, view):
-        if not (view.is_scratch()):
-            if sublime.active_window().extract_variables()['file_extension'] == 'inex':
-                self.deleteTemp(view)
+        try:
+            if not (view.is_scratch()):
+                if sublime.active_window().extract_variables()['file_extension'] == 'inex':
+                    self.deleteTemp(view)
+        except Exception as e:
+           print()
 
     def on_post_save(self, view):
-        if not (view.is_scratch()):
-            if sublime.active_window().extract_variables()['file_extension'] == 'inex':
-                self.saveTemp(self)
+        try:
+            if not (view.is_scratch()):
+                if sublime.active_window().extract_variables()['file_extension'] == 'inex':
+                    self.saveTemp(self)
+        except Exception as e:
+           print()
 
     # function to set the variables
     def initVariables(self, view):
