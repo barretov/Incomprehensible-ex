@@ -47,4 +47,5 @@ Usage
     a new file with the extension [.inex] will open.
 
     [EDIT MODE] [!WARNING!]
-        In edit mode, if you save a document you will lose the styles and formatting of the document because of the file conversion.
+        In edit mode, if you save a document you will lose the styles and formatting of the document because
+        of the file conversion.
