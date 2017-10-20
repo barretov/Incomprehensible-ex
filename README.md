@@ -9,7 +9,7 @@ About
         csv, doc, docx, eml, epub, gif, jpg, json, html, mp3, msg, odt, ogg, pdf, png, pptx, ps, rtf,
         tiff, txt, wav, xlsx, xls
 
-    Extensions that can be dictated in edit mode:
+    Extensions available in edit mode:
         asciidoc, beamer, commonmark, context, docbook, docx, dokuwiki, dzslides, fb2, haddock, html,
         html5, icml, latex, man, markdown, markdown_github, markdown_mmd, markdown_phpextra,
         markdown_strict, mediawiki, native, odt, opendocument, opml, org, plain, revealjs, rst, rtf, s5,
@@ -48,4 +48,4 @@ Usage
 
     [EDIT MODE] [!WARNING!]
         In edit mode, if you save a document you will lose the styles and formatting of the document because
-        of the file conversion.
+        of file conversion.
