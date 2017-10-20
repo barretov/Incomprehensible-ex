@@ -42,7 +42,6 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
                                            args={'view'},
                                            name=self.file
                                            )
-
             self.thread.start()
 
     def on_pre_close(self, view):
@@ -82,7 +81,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             if ext in self.editable_extensions and self.editMode == True:
                 self.convert(self, inp, out, ext, self.editMode)
             else:
-                print(ext + " is not supported for edit mode or can't save this file")
+                print("[" + ext + "] Is not supported for edit mode or can't save this file")
         except Exception as error:
             print(error)
 
@@ -121,9 +120,7 @@ class IncomprehensibleEx (sublime_plugin.EventListener):
             # convert file
             self.convert(self, self.inp, self.out, self.ext, False)
             # open new file
-            sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex')
-            # @TODO:, indent | Arrumar
-            sublime.active_window().run_command("reindent", {"single_line": false})
+            sublime.active_window().open_file(os.path.join(self.path, self.file)+'.inex').run_command("reindent", {"single_line": False})
 
         except KeyError as error:
             print(error)
