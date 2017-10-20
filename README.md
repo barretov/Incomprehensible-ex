@@ -1,5 +1,5 @@
 # Incomprehensible Ex
-Sublime Text plugin to read or edit incomprehensible files as docx, odt, pdf, epub and more.
+Sublime Text plugin to read or edit incomprehensible extensions as docx, odt, pdf, epub and more.
 
 --------------------------------------------------------------------------------------------
 
